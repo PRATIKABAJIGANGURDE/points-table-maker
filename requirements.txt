@@ -1,0 +1,6 @@
+discord.py
+python-dotenv
+google-generativeai
+supabase
+pillow
+pandas
