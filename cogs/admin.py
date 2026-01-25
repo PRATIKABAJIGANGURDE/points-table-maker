@@ -55,41 +55,40 @@ class Admin(commands.Cog):
         
         await interaction.response.defer(ephemeral=True)
         
-        # Use DB Manager
-        db.update_branding(guild_id, host_name)
-        
-        # No SQLite connection needed here anymore
-        
         msg = f"✅ Host Name set to **{host_name}**."
-        
-        # Save Logo if provided
+
         if logo:
             if not logo.content_type.startswith("image/"):
                 return await interaction.followup.send("Invalid image format. Please upload PNG or JPG.")
-                
-            import aiohttp
-            import os
-            
-            # Save to assets/logo_{guild_id}.png
-            # Assuming assets folder exists from main.py or image_gen.py context
-            save_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets")
-            if not os.path.exists(save_dir):
-                os.makedirs(save_dir)
-                
-            save_path = os.path.join(save_dir, f"logo_{guild_id}.png")
-            
+
             try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(logo.url) as resp:
-                        if resp.status == 200:
-                            data = await resp.read()
-                            with open(save_path, "wb") as f:
-                                f.write(data)
-                            msg += "\n✅ Logo updated successfully!"
-                        else:
-                            msg += "\n❌ Failed to download logo."
+                # 1. Get Staff Channel (to proxy the image)
+                config = db.get_config(guild_id)
+                staff_channel_id = config[3] if config else None
+                
+                logo_url_to_save = logo.url # Default to temp url
+                
+                if staff_channel_id:
+                     staff_channel = interaction.guild.get_channel(int(staff_channel_id))
+                     if staff_channel:
+                         # Proxy the image
+                         file_msg = await staff_channel.send(file=await logo.to_file(), content="🔒 **System Asset:** Branding Logo (Do not delete)")
+                         if file_msg.attachments:
+                            logo_url_to_save = file_msg.attachments[0].url
+                         msg += "\n✅ Logo proxied to staff channel for permanent hosting."
+                
+                # 2. Save URL to Database
+                db.update_branding(guild_id, host_name, logo_url_to_save)
+                msg += "\n✅ Logo URL saved to database!"
+                
             except Exception as e:
                 msg += f"\n❌ Error saving logo: {e}"
+                # Still try to save name if logo failed
+                db.update_branding(guild_id, host_name)
+
+        else:
+             # Just update name
+             db.update_branding(guild_id, host_name)
 
         await interaction.followup.send(msg)
 

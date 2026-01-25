@@ -51,22 +51,36 @@ def generate_points_table(lobby_name, host_name, teams_data, logo_path=None):
     font_bold = get_font(["segoeuib.ttf", "arialbd.ttf"], 23)  # Smaller Team Names
     font_data = get_font(["segoeuib.ttf", "arialbd.ttf"], 25)  # Smaller Stats
     font_header = get_font(["segoeui.ttf", "arial.ttf"], 18)
-    font_sub = get_font(["segoeui.ttf", "arial.ttf"], 22)
+    font_sub = get_font(["segoeui.ttf", "arial.ttf"], 32)
     font_logo = get_font(["segoeuib.ttf", "arialbd.ttf"], 36)
 
     # --- HEADER SECTION ---
     # Layout: [Logo]  [Host Name] (Centered together)
     # 1. Load Logo
     # 1. Load Logo
+    import requests
+    import io
+    
     if not logo_path:
+        # Fallback to local default
         logo_path = os.path.join(os.path.dirname(__file__), "assets", "logo.png")
+        
     logo_img = None
-    if os.path.exists(logo_path):
-        try:
+    
+    try:
+        # Check if URL
+        if logo_path.startswith("http"):
+            resp = requests.get(logo_path)
+            if resp.status_code == 200:
+                logo_img = Image.open(io.BytesIO(resp.content))
+        elif os.path.exists(logo_path):
             logo_img = Image.open(logo_path)
-            logo_img.thumbnail((120, 120), Image.Resampling.LANCZOS) # Smaller logo for side-by-side
-        except:
-            pass
+            
+        if logo_img:
+            logo_img.thumbnail((120, 120), Image.Resampling.LANCZOS)
+    except Exception as e:
+        print(f"Error loading logo: {e}")
+        pass
 
     # 2. Prepare Text
     font_host_big = get_font(["segoeuib.ttf", "arialbd.ttf"], 65) # Slightly smaller to fit side-by-side
@@ -80,7 +94,7 @@ def generate_points_table(lobby_name, host_name, teams_data, logo_path=None):
     total_w = logo_w + padding + text_w
     
     start_x = (W - total_w) // 2
-    header_base_y = 60
+    header_base_y = 120
     
     # 4. Draw
     if logo_img:
@@ -91,7 +105,7 @@ def generate_points_table(lobby_name, host_name, teams_data, logo_path=None):
     draw.text((start_x + logo_w + padding, header_base_y), host_name.upper(), font=font_host_big, fill=(255, 255, 255), anchor="lt")
     
     # 5. "Overall Standings" Subtitle
-    draw.text((W//2, header_base_y + text_h + 20), "OVERALL STANDINGS", font=font_sub, fill=(200, 200, 200), anchor="mt")
+    draw.text((W//2, header_base_y + text_h + 30), "OVERALL STANDINGS", font=font_sub, fill=(200, 200, 200), anchor="mt")
     
     header_bottom_y = header_base_y + text_h + 50
 

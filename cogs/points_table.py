@@ -61,11 +61,10 @@ class PointsManager(commands.Cog):
         # 0:guild_id, 1:role, 2:time, 3:staff, 4:results, 5:reg, 6:host_name, 7:host_logo
         host_name = config_row[6] if config_row and len(config_row) > 6 and config_row[6] else (interaction.guild.name if interaction.guild else "Unknown Host")
         
-        # 2. Get Logo Path
-        logo_path = None
-        custom_logo = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", f"logo_{interaction.guild.id}.png")
-        if os.path.exists(custom_logo):
-            logo_path = custom_logo
+        # 2. Get Logo URL from DB
+        logo_path = config_row[7] if config_row and len(config_row) > 7 else None
+        
+        # Fallback (optional, logic inside image_gen handles None)
 
         img_path = generate_points_table(lobby_name, host_name, teams_data, logo_path=logo_path)
         

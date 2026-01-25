@@ -50,8 +50,10 @@ class DatabaseManager:
         }
         self.supabase.table("server_config").upsert(data).execute()
 
-    def update_branding(self, guild_id, host_name):
+    def update_branding(self, guild_id, host_name, host_logo=None):
         data = {"guild_id": str(guild_id), "host_name": host_name}
+        if host_logo:
+             data["host_logo"] = host_logo
         self.supabase.table("server_config").upsert(data).execute()
 
     # --- Lobbies ---
