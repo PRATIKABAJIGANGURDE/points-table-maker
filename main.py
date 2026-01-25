@@ -46,7 +46,16 @@ class PTMaker(commands.Bot):
         for command in self.tree.get_commands():
             print(f"- /{command.name}")
         
-        print("\nSyncing commands to guilds...")
+        # Sync globally ONCE (this enables the checkmark/APP label)
+        print("\n🌐 Syncing commands globally to Discord...")
+        try:
+            global_synced = await self.tree.sync()
+            print(f"✅ Globally synced {len(global_synced)} commands! (May take up to 1 hour to propagate)")
+        except Exception as e:
+            print(f"❌ Failed to sync globally: {e}")
+        
+        # Then sync to each guild for instant availability
+        print("\nSyncing commands to guilds for instant access...")
         for guild in self.guilds:
             try:
                 self.tree.copy_global_to(guild=guild)
