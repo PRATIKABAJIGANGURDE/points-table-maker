@@ -651,6 +651,9 @@ class Matches(commands.Cog):
     @app_commands.command(name="matches", description="List all confirmed matches in a lobby")
     @app_commands.describe(lobby_id="Lobby ID to view matches for")
     async def list_matches(self, interaction: discord.Interaction, lobby_id: int):
+        if not is_scrim_admin(interaction.user):
+            return await interaction.response.send_message("No permission.", ephemeral=True)
+
         matches = db.get_matches_in_lobby(lobby_id)
         if not matches:
              return await interaction.response.send_message(f"No matches found for Lobby {lobby_id}.", ephemeral=True)

@@ -6,48 +6,58 @@ class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="help", description="Show all available commands")
+    @app_commands.command(name="help", description="Show admin operations workflow")
     async def help_command(self, interaction: discord.Interaction):
         embed = discord.Embed(
-            title="🤖 Scrim Bot Help Menu",
-            description="Manage your Free Fire scrims, automate slot lists, and generate Points Tables with AI.",
+            title="🛡️ Scrim Operations Bot (Admin Only)",
+            description=(
+                "⚠️ **This bot is intended for Scrim Admins & Management only.**\n"
+                "Player interaction is not supported.\n\n"
+                "**Goal:** Manage Free Fire scrims end-to-end (Lobby → AI Results → Points Table)."
+            ),
             color=discord.Color.gold()
         )
         
-        # 1. Scrim Management
+        # 1. Scrim Workflow
         embed.add_field(
-            name="🎮 Scrim Management",
+            name="🧭 Scrim Workflow",
             value=(
-                "`/start_scrim` - Create a new lobby & paste slot list.\n"
-                "`/upload_lobby_ss` - (Alternative) Upload screenshot to auto-fill slots.\n"
-                "`/slots [lobby_id]` - View current slot list.\n"
-                "`/end_scrim [lobby_id]` - End scrim & generate final Points Table."
+                "**1️⃣ /start_scrim**\n"
+                "Create a new lobby & paste/upload slot list.\n\n"
+                "**2️⃣ Upload Slot List**\n"
+                "(Done within /start_scrim or /slots)\n\n"
+                "**3️⃣ Upload Lobby Screenshot**\n"
+                "Use `/upload_lobby_ss` to auto-fill & verify slots.\n\n"
+                "**4️⃣ /submit_match**\n"
+                "Upload match result screenshots. AI extracts data (confirmation required).\n\n"
+                "**5️⃣ /edit_match (if needed)**\n"
+                "Fix any incorrect extraction or missing data.\n\n"
+                "**6️⃣ /end_scrim**\n"
+                "Automatically generate & send the final Points Table."
             ),
             inline=False
         )
         
-        # 2. Match Results
+        # 2. Recovery / Fixes
         embed.add_field(
-            name="📊 Match Results",
+            name="🛠️ Recovery & Fixes",
             value=(
-                "`/submit_match [lobby_id] [match_no] [images]` - Upload match screenshots for AI processing.\n"
-                "*The bot will automatically extract kills/ranks & ask for confirmation.*"
+                "• **Wrong match data?** → Use `/edit_match`\n"
+                "• **Uploaded wrong image?** → Re-run `/submit_match` (overwrites)\n"
+                "• **Missing commands?** → Run `/sync`\n"
+                "• **New server setup?** → Run `/setup`"
             ),
             inline=False
         )
         
-        # 3. Admin & Setup
+        # 3. AI Safety Notice
         embed.add_field(
-            name="⚙️ Admin & Setup",
-            value=(
-                "`/setup [role] [channels...]` - Configure admin role & channels.\n"
-                "`/set_branding [host_name] [logo]` - Set your Tournament Banner & Logo.\n"
-                "`/sync` - Sync bot commands (Fix if commands are missing)."
-            ),
+            name="🤖 AI Notice",
+            value="Screenshot analysis is assistive. **All results must be reviewed** before final submission.",
             inline=False
         )
         
-        embed.set_footer(text="Developed for High-Precision Scrims")
+        embed.set_footer(text="Internal Ops Tool v2.0")
         
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

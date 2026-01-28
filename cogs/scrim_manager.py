@@ -214,5 +214,42 @@ class ScrimManager(commands.Cog):
         
         await interaction.followup.send(embed=embed)
 
+    @app_commands.command(name="status", description="Check current status of a scrim lobby")
+    @app_commands.describe(lobby_id="Lobby ID")
+    async def status(self, interaction: discord.Interaction, lobby_id: int):
+        if not is_scrim_admin(interaction.user):
+            return await interaction.response.send_message("No permission.", ephemeral=True)
+            
+        lobby = db.get_lobby(lobby_id)
+        if not lobby:
+            return await interaction.response.send_message("❌ Lobby not found.", ephemeral=True)
+            
+        # Unpack lobby data
+        # (id, guild_id, name, state, max_teams, reg_start, match_start, channel_id)
+        _, _, name, state, _, _, _, _ = lobby
+        
+        matches = db.get_matches_in_lobby(lobby_id)
+        match_count = len(matches)
+        last_match_no = max([m['match_no'] for m in matches]) if matches else 0
+        
+        embed = discord.Embed(title=f"📊 Status: {name}", color=discord.Color.blue())
+        
+        embed.add_field(name="Scrim State", value=state, inline=True)
+        embed.add_field(name="Matches Completed", value=str(match_count), inline=True)
+        
+        next_step = f"Upload Match {last_match_no + 1} Result"
+        if state == "COMPLETED":
+            next_step = "Scrim Ended"
+            
+        embed.add_field(name="Current Step", value=next_step, inline=False)
+        
+        if matches:
+            match_list = ", ".join([f"#{m['match_no']}" for m in matches])
+            embed.add_field(name="Matches Logged", value=match_list, inline=False)
+            
+        embed.set_footer(text=f"Lobby ID: {lobby_id}")
+        
+        await interaction.response.send_message(embed=embed)
+
 async def setup(bot):
     await bot.add_cog(ScrimManager(bot))

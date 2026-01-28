@@ -42,45 +42,33 @@ class GuildJoin(commands.Cog):
             # 2. DM the Server Owner
             if guild.owner:
                 embed = discord.Embed(
-                    title="🎉 Thank you for adding ScrimHub!",
-                    description="The Ultimate Free Fire Points Table & Tournament Bot",
+                    title="🎉 PT Maker Added Successfully!",
+                    description=(
+                        "This bot is designed for **Scrim Admins & Management teams**\n"
+                        "to manage Free Fire scrims end-to-end."
+                    ),
                     color=discord.Color.blue()
                 )
                 
                 embed.add_field(
-                    name="Added to:",
-                    value=f"**{guild.name}**",
-                    inline=False
-                )
-                
-                embed.add_field(
-                    name="🚀 Quick Start",
+                    name="🚀 Recommended Flow",
                     value=(
-                        "`/setup` - Configure the bot\n"
-                        "`/set_branding` - Set your host logo\n"
-                        "`/create_scrim` - Start a scrim\n"
-                        "`/end_scrim` - Generate Points Table"
+                        "1️⃣ `/setup` – Configure admin role & channels\n"
+                        "2️⃣ `/start_scrim` – Create a new scrim\n"
+                        "3️⃣ Upload slot list & lobby screenshot\n"
+                        "4️⃣ `/submit_match` – Upload match results\n"
+                        "5️⃣ `/end_scrim` – Auto-generate Points Table"
                     ),
                     inline=False
                 )
                 
                 embed.add_field(
-                    name="🔥 Key Features",
-                    value=(
-                        "• Result Tracking - AI-powered screenshot analysis\n"
-                        "• Points Table - Beautiful auto-generated tables\n"
-                        "• Scrim Management - Easy scrim creation and tracking"
-                    ),
+                    name="🤖 AI Notice",
+                    value="AI-assisted result extraction requires **admin confirmation** for every match.",
                     inline=False
                 )
                 
-                embed.add_field(
-                    name="📱 Mobile Optimized",
-                    value="Perfect for Free Fire organizers! All commands work seamlessly on mobile devices.",
-                    inline=False
-                )
-                
-                embed.set_footer(text="Use /help to get started")
+                embed.set_footer(text="Use /help to view the full workflow.")
                 
                 try:
                     await guild.owner.send(embed=embed)
