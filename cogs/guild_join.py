@@ -42,7 +42,7 @@ class GuildJoin(commands.Cog):
             # 2. DM the Server Owner
             if guild.owner:
                 embed = discord.Embed(
-                    title="🎉 PT Maker Added Successfully!",
+                    title="🎉 ScrimHub Added Successfully!",
                     description=(
                         "This bot is designed for **Scrim Admins & Management teams**\n"
                         "to manage Free Fire scrims end-to-end."
